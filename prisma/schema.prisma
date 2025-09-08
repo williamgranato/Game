@@ -1,0 +1,35 @@
+
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Player {
+  id        Int       @id @default(autoincrement())
+  name      String
+  level     Int       @default(1)
+  hp        Int       @default(100)
+  stamina   Int       @default(100)
+  money     Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  states    GameState[]
+}
+
+model GameState {
+  id        Int       @id @default(autoincrement())
+  playerId  Int
+  slot      Int       @default(0)
+  state     Json
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  player    Player    @relation(fields: [playerId], references: [id])
+
+  @@unique([playerId, slot])
+}

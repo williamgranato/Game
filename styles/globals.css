@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: dark; }
+body { @apply bg-zinc-950 text-zinc-100; }
+
+.btn { @apply px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 transition border border-zinc-700; }
+.btn-primary { @apply bg-yellow-600 hover:bg-yellow-500 border-yellow-600; }
+.btn-good { @apply bg-emerald-600 hover:bg-emerald-500 border-emerald-600; }
+.btn-danger { @apply bg-rose-600 hover:bg-rose-500 border-rose-600; }
+.badge { @apply inline-block px-2 py-0.5 rounded-lg text-xs; }
+.badge-info { @apply bg-zinc-800 border border-zinc-700 text-zinc-300; }
+.card { @apply rounded-2xl bg-zinc-900/60 border border-zinc-800 p-4; }
+
+.bar { @apply w-40 h-2 rounded bg-zinc-800 overflow-hidden; }
+.bar-fill { @apply h-2; }
+.bar-hp { @apply bg-rose-500; }
+.bar-sta { @apply bg-emerald-500; }
+
+/* Quality colors */
+.q-regular { @apply border-zinc-700 text-zinc-200; }
+.q-incomum { @apply border-emerald-600 text-emerald-300; }
+.q-raro { @apply border-sky-600 text-sky-300; }
+.q-epico { @apply border-pink-600 text-pink-300; }
+.q-lendario { @apply border-yellow-500 text-yellow-300; }
+.q-mitico { @apply border-red-600 text-red-300; }
+.q-divino { @apply border-cyan-500 text-cyan-300; }
+
+/* Tabs */
+.tab { @apply px-3 py-2 rounded-lg bg-zinc-800/60 border border-zinc-800; }
+.tab-active { @apply bg-yellow-600 border-yellow-600 text-black; }

@@ -1,0 +1,13 @@
+
+/* Extra visual polish */
+
+@keyframes pulseSlow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+.animate-pulseSlow { animation: pulseSlow 3s infinite; }
+
+/* Colored log messages */
+.log-success { color: #22c55e; }
+.log-warn { color: #facc15; }
+.log-error { color: #ef4444; }
