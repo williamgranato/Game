@@ -1,17 +1,18 @@
-
 'use client';
 import React from "react";
 
 export default function TabPrincipalView({ ctx }){
   const {
     player, day, hour, season, RANKS, rankIdx, ICONS,
-    inventory, uiQuality, setUiQuality,
-    ITEMS, QUALITY, QUALITY_ORDER, withQualityKey, parseQualityKey, qualityStyle,
-    fmtMoney, unitPrice, buy, sell, equipItem,
-    drinkPotion, useAbility, repair, contracts
+    inventory, ITEMS, QUALITY, QUALITY_ORDER, parseQualityKey, qualityStyle,
+    fmtMoney
   } = ctx;
 
   const safeEquip = (player && player.equip) ? player.equip : { weapon:null, armor:null, weaponDur:0, armorDur:0 };
+
+  function qualityName(q){
+    return QUALITY[q]?.name || "Normal";
+  }
 
   return (
     <div className="space-y-4">
@@ -25,80 +26,45 @@ export default function TabPrincipalView({ ctx }){
               <div className="text-zinc-400">{RANKS[rankIdx].icon} {RANKS[rankIdx].name} · Dia {day}, {String(hour).padStart(2,'0')}:00 — {season.icon} {season.name}</div>
             </div>
           </div>
-          <div className="space-y-2 w-full md:w-auto md:min-w-[320px]">
-            <div className="flex items-center gap-2">
-              <span>HP</span>
-              <div className="bar w-full">
-                <div className="bar-fill bar-hp transition-all duration-700" style={{width:`${player.hp}%`}}/>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <span>Stamina</span>
-              <div className="bar w-full">
-                <div className="bar-fill bar-sta transition-all duration-700" style={{width:`${player.stamina}%`}}/>
-              </div>
-            </div>
-          </div>
         </div>
         <div className="grid grid-cols-2 gap-2 text-sm pt-2">
           <div>Moedas: <b title={player.money}>{fmtMoney(player.money)} 💰</b></div>
-          <div>Comércio: {player.trade} · Talentos: {player.talentPts}</div>
+          <div>Slots usados: {Object.values(inventory).reduce((a,b)=>a+b,0)} / {player.inventorySlots}</div>
           <div>Arma: {safeEquip.weapon? parseQualityKey(safeEquip.weapon).q.toUpperCase(): "(nenhuma)"} <span className="badge badge-info">{safeEquip.weaponDur ?? 0}%</span></div>
           <div>Armadura: {safeEquip.armor? parseQualityKey(safeEquip.armor).q.toUpperCase(): "(nenhuma)"} <span className="badge badge-info">{safeEquip.armorDur ?? 0}%</span></div>
-          <div>Contratos ativos: {contracts.filter(c=>c.status==='aceito' && c.progress < c.time).length}</div>
-        </div>
-        <div className="flex gap-2 pt-2 flex-wrap">
-          <button onClick={drinkPotion} className="btn">Beber Poção</button>
-          <button onClick={useAbility} className="btn">Golpe Poderoso {player.abilityCD>0?`(${player.abilityCD}h)`:''}</button>
-          <button onClick={repair} className="btn">Usar Kit de Reparos</button>
         </div>
       </div>
 
       <div className="card">
-        <h2 className="text-lg font-semibold mb-2">Atributos</h2>
-        {[["forca","Força"],["destreza","Destreza"],["vigor","Vigor"],["arcano","Arcano"],["carisma","Carisma"],["sagacidade","Sagacidade"]].map(([k,label])=>(
-          <div key={k} className="flex items-center justify-between mb-1 text-sm">
-            <div className="flex items-center gap-2">
-              <img src={ICONS[k]} className="w-4 h-4 opacity-90" alt=""/>
-              <div className="text-zinc-300">{label}</div>
-            </div>
-            <div className="text-zinc-400">{player.attrs[k]}</div>
-          </div>
-        ))}
-      </div>
-
-      <div className="card">
-        <h2 className="text-lg font-semibold mb-2">Inventário Rápido</h2>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+        <h2 className="text-lg font-semibold mb-2">Inventário</h2>
+      <div className="text-xs text-zinc-400 mb-2">Slots: {ctx.inventoryUsedSlots} / {ctx.inventorySlots}</div>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
           {ITEMS.map(it=>{
-            const qSel = uiQuality[it.id] || "regular";
-            const priceShown = unitPrice(it.id, qSel);
-            const presentVariants = QUALITY_ORDER.filter(q => (inventory[withQualityKey(it.id, q)] || 0) > 0 || (q==='regular' && (inventory[it.id]||0)>0));
-            const style = qualityStyle(qSel);
+            // Checar quantidade total (somando variantes de qualidade)
+            const totalCount = QUALITY_ORDER.reduce((sum,q)=>{
+              const key = (q==='regular'? it.id : it.id+":"+q);
+              return sum + (inventory[key]||0);
+            }, 0);
+            if(!totalCount) return null;
+
+            // Pega a melhor qualidade presente
+            const qPresent = QUALITY_ORDER.find(q=>{
+              const key = (q==='regular'? it.id : it.id+":"+q);
+              return (inventory[key]||0)>0;
+            }) || "regular";
+
+            const key = (qPresent==='regular'? it.id : it.id+":"+qPresent);
+            const count = inventory[key]||0;
+            const style = qualityStyle(qPresent);
+
             return (
-              <div key={it.id} className={`flex items-center justify-between gap-2 border rounded-xl p-2 ${style.border}`}>
-                <div className="flex items-center gap-2">
-                  <img src={it.icon} alt="" className="w-8 h-8 rounded border border-zinc-700" />
-                  <div>
-                    <div className={`font-medium ${style.text}`}>{it.name} ({QUALITY[qSel].name})</div>
-                    <div className="text-xs text-zinc-400">Preço: {fmtMoney(priceShown)}</div>
-                  </div>
+              <div key={it.id} className={`p-3 rounded-xl border ${style.border} bg-zinc-900/60 flex flex-col`}>
+                <img src={it.icon} alt="" className="w-12 h-12 mx-auto mb-2 rounded border border-zinc-700"/>
+                <div className={`font-medium text-center ${style.text}`} title={qualityName(qPresent)}>
+                  {it.name} (x{count})
                 </div>
-                <div className="flex items-center gap-2">
-                  <select className="px-2 py-1 rounded bg-zinc-800" value={qSel} onChange={(e)=>setUiQuality(u=>({...u,[it.id]:e.target.value}))}>
-                    {QUALITY_ORDER.map(q => <option key={q} value={q}>{QUALITY[q].name}</option>)}
-                  </select>
-                  <div className="text-xs text-zinc-400">
-                    {presentVariants.map(q => {
-                      const key = withQualityKey(it.id, q);
-                      const count = (q==='regular' ? (inventory[it.id]||0) : (inventory[key]||0));
-                      if (!count) return null;
-                      return <span key={q} className="ml-2">{QUALITY[q].name}: x{count}</span>;
-                    })}
-                  </div>
-                  <button onClick={()=>buy(it.id,1,qSel)} className="btn">Comprar</button>
-                  <button onClick={()=>sell(it.id,1,qSel)} className="btn">Vender</button>
-                  {(it.id==='dagger_iron'||it.id==='armor_leather') && <button onClick={()=>equipItem(it.id)} className="btn btn-primary">Equipar</button>}
+                <div className="text-xs text-zinc-400 text-center mt-1">
+                  Valor de mercado: {fmtMoney(it.base)}
                 </div>
               </div>
             );

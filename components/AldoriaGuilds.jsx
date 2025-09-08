@@ -67,12 +67,26 @@ export default function AldoriaGuilds(){
     appearance:{ gender:'male', hair:'short_brown', skin:'light', face:'base', clazz:'warrior' },
     equip:{ weapon:null, armor:null, weaponDur:100, armorDur:100 },
     money: toBronze({ copper: 60 }),
+    inventorySlots: 20,
     rank: 'bronze',
     abilityCD:0
   });
   const [inventory,setInventory] = useState({
     herb_common:0, ore_iron:0, leather_raw:0, potion_minor:1, arrows_20:0, repair_kit:1, dagger_iron:0, armor_leather:0
   });
+
+// ==== INVENTORY SLOTS HELPERS ====
+function inventoryUsedSlots(inv = inventory){
+  let used = 0;
+  for (const [k,v] of Object.entries(inv||{})){
+    if (v && v > 0) used += 1; // 1 slot por pilha
+  }
+  return used;
+}
+function inventoryHasFreeSlot(inv = inventory){
+  return inventoryUsedSlots(inv) < (player?.inventorySlots ?? 20);
+}
+
   const [contracts,setContracts] = useState([]);
   const [modifiers,setModifiers] = useState({});
   const [auction,setAuction] = useState({ lots:[], open:false });
@@ -168,7 +182,24 @@ export default function AldoriaGuilds(){
 
   function earn(b){ setPlayer(p=>({...p, money: p.money + b })); setDiary(d=>({...d, coins:d.coins + b })); }
   function spend(b){ if(player.money<b) return false; setPlayer(p=>({...p, money: p.money - b })); return true; }
-  function addItem(idOrKey,qty,q='regular'){ const key=idOrKey.includes('__')?idOrKey:withQualityKey(idOrKey,q); setInventory(inv=>({...inv, [key]: (inv[key]||0)+qty })); }
+  
+  
+function addItem(idOrKey, qty, q='regular'){
+  const key = idOrKey.includes('__') ? idOrKey : withQualityKey(idOrKey, q);
+  setInventory(inv => {
+    const before = inv[key] || 0;
+    // Se vai criar uma nova pilha e não há espaço, bloqueia
+    if (before <= 0){
+      const used = Object.entries(inv).filter(([k,v]) => v>0).length;
+      const slots = player?.inventorySlots ?? 20;
+      if (used >= slots){
+        pushLog({ t:'warn', msg:'Inventário cheio. Compre uma melhoria de mochila no Mercado.' });
+        return inv;
+      }
+    }
+    return { ...inv, [key]: before + (qty||0) };
+  });
+}
   function removeItem(idOrKey,qty,q='regular'){ const key=idOrKey.includes('__')?idOrKey:withQualityKey(idOrKey,q); setInventory(inv=>({...inv, [key]: Math.max(0,(inv[key]||0)-qty) })); }
 
   function advance(hours=1, activeId=null){
@@ -517,7 +548,7 @@ export default function AldoriaGuilds(){
 
   const ctx = {
     player, day, hour, season, RANKS, rankIdx, ICONS,
-    inventory, uiQuality, setUiQuality,
+    inventory, inventorySlots: player.inventorySlots, inventoryUsedSlots: inventoryUsedSlots(), uiQuality, setUiQuality,
     contracts, setContracts, activeContractId, setActiveContractId,
     rotatingOffers, auction, diary, modifiers, priceHist, prevPrices, rank, toBronze,
     ITEMS, RECIPES, QUALITY, QUALITY_ORDER, withQualityKey, parseQualityKey, qualityStyle,
