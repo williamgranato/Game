@@ -1,5 +1,3 @@
-
-// prisma/schema.prisma
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,26 +8,45 @@ datasource db {
 }
 
 model Player {
-  id        Int       @id @default(autoincrement())
-  name      String
-  level     Int       @default(1)
-  hp        Int       @default(100)
-  stamina   Int       @default(100)
-  money     Int       @default(0)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-  states    GameState[]
+  id         String   @id @default(cuid())
+  name       String
+  level      Int      @default(1)
+  exp        Int      @default(0)
+  reputation Int      @default(0)
+  stamina    Int      @default(100)
+  gold       Int      @default(0)
+  silver     Int      @default(50)
+  bronze     Int      @default(0)
+  copper     Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  missionProgress MissionProgress[]
+  inventory       InventoryItem[]
 }
 
-model GameState {
-  id        Int       @id @default(autoincrement())
-  playerId  Int
-  slot      Int       @default(0)
-  state     Json
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
+model MissionProgress {
+  id         String   @id @default(cuid())
+  playerId   String
+  missionId  String
+  rank       String
+  endsAt     DateTime
+  completed  Boolean  @default(false)
+  createdAt  DateTime @default(now())
 
-  player    Player    @relation(fields: [playerId], references: [id])
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
 
-  @@unique([playerId, slot])
+  @@index([playerId, missionId, completed])
+}
+
+model InventoryItem {
+  id        String   @id @default(cuid())
+  playerId  String
+  item      String
+  qty       Int      @default(0)
+  createdAt DateTime @default(now())
+
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@unique([playerId, item])
 }
