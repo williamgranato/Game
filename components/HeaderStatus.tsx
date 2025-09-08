@@ -5,19 +5,16 @@ import { useGameV2State } from '../hooks/useGameV2State';
 
 export default function HeaderStatus(){
   const { state } = useGameV2State();
-  const w = state.wallet;
-  const player = state.player;
+  const w = state.wallet || { gold:0, silver:0, bronze:0, copper:0 };
+  const player = state.player || { level:1, exp:0, reputation:0 };
 
-  // Barra de exp
   const expNeeded = 100 + player.level * 50;
   const expPercent = Math.min(100, (player.exp / expNeeded) * 100);
 
-  // Determinar estação fictícia (baseado no mês atual)
   const seasonNames = ['🌸 Primavera','☀️ Verão','🍂 Outono','❄️ Inverno'];
   const seasonIdx = Math.floor(((new Date().getMonth()+1) % 12) / 3);
   const season = seasonNames[seasonIdx];
 
-  // Determinar título reputação
   let title = 'Desconhecido';
   if(player.reputation>=10) title='Respeitado';
   if(player.reputation>=25) title='Renomado';
@@ -26,11 +23,9 @@ export default function HeaderStatus(){
   return (
     <div className="rounded-2xl border border-zinc-800 bg-black/40 p-4 mb-4 shadow-lg">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        
-        {/* Avatar e status básico */}
         <div className="flex items-center gap-4">
           <div className="relative">
-            <Image src="/images/avatar.png" width={72} height={72} alt="Avatar" 
+            <Image src="/images/avatar.png" width={72} height={72} alt="Avatar"
               className="rounded-2xl border-4 border-amber-500 shadow-lg"/>
           </div>
           <div>
@@ -44,7 +39,6 @@ export default function HeaderStatus(){
           </div>
         </div>
 
-        {/* Carteira */}
         <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
           <div className="flex items-center gap-2">
             <Image src="/icons/gold.png" width={20} height={20} alt="ouro"/>

@@ -8,7 +8,7 @@ export default function ActivityLog(){
     <div className="rounded-2xl border border-zinc-800 bg-black/30 p-3 text-sm max-h-72 overflow-auto">
       <div className="font-semibold mb-1">Atividades</div>
       <ul className="space-y-1">
-        {state.logs.map((l,i)=>(<li key={i} className="opacity-90">{l}</li>))}
+        {(state.logs || []).map((l,i)=>(<li key={i} className="opacity-90">{l}</li>))}
       </ul>
     </div>
   );

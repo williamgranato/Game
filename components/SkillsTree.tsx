@@ -10,7 +10,7 @@ export default function SkillsTree(){
       <h2 className="text-xl font-semibold">Árvore de Habilidades</h2>
       <div className="grid md:grid-cols-2 gap-3">
         {SKILLS.map(s => {
-          const current = state.skills[s.id]||0;
+          const current = (state.skills || {})[s.id] || 0;
           const can = current < s.maxLevel;
           return (
             <div key={s.id} className="rounded-2xl border border-zinc-800 bg-black/30 p-4">

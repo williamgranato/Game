@@ -3,7 +3,7 @@ import React from 'react';
 import { useGameV2State } from '../hooks/useGameV2State';
 export default function SidebarHUD(){
   const { state } = useGameV2State();
-  const w = state.wallet;
+ const w = state.wallet || { gold:0, silver:0, bronze:0, copper:0 };
   return (
     <div className="rounded-2xl border border-zinc-800 bg-black/30 p-4 space-y-2">
       <div className="font-semibold">Status</div>
