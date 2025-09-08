@@ -41,19 +41,19 @@ export default function HeaderStatus(){
 
         <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
           <div className="flex items-center gap-2">
-            <Image src="/icons/gold.png" width={20} height={20} alt="ouro"/>
+            <Image src="/images/items/gold.png" width={20} height={20} alt="ouro"/>
             <span className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-500 drop-shadow-[0_0_5px_#facc15]">Ouro:</span> {w.gold}
           </div>
           <div className="flex items-center gap-2">
-            <Image src="/icons/silver.png" width={20} height={20} alt="prata"/>
+            <Image src="/images/items/silver.png" width={20} height={20} alt="prata"/>
             <span className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-gray-300 to-gray-500 drop-shadow-[0_0_5px_#9ca3af]">Prata:</span> {w.silver}
           </div>
           <div className="flex items-center gap-2">
-            <Image src="/icons/bronze.png" width={20} height={20} alt="bronze"/>
+            <Image src="/images/items/bronze.png" width={20} height={20} alt="bronze"/>
             <span className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-700 drop-shadow-[0_0_5px_#fb923c]">Bronze:</span> {w.bronze}
           </div>
           <div className="flex items-center gap-2">
-            <Image src="/icons/copper.png" width={20} height={20} alt="cobre"/>
+            <Image src="/images/items/copper.png" width={20} height={20} alt="cobre"/>
             <span className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-orange-300 to-red-600 drop-shadow-[0_0_5px_#f87171]">Cobre:</span> {w.copper}
           </div>
         </div>
