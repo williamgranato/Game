@@ -8,6 +8,11 @@ export default function TabPrincipalView({ ctx }){
     fmtMoney
   } = ctx;
 
+// Cálculo de slots usados (pilhas de até 100 por chave)
+const usedSlots = Object.values(inventory).reduce((acc, qty)=> acc + Math.ceil(Math.max(0, qty||0)/100), 0);
+const totalSlots = player?.inventorySlots ?? 10;
+
+
   const safeEquip = (player && player.equip) ? player.equip : { weapon:null, armor:null, weaponDur:0, armorDur:0 };
 
   function qualityName(q){
@@ -29,7 +34,7 @@ export default function TabPrincipalView({ ctx }){
         </div>
         <div className="grid grid-cols-2 gap-2 text-sm pt-2">
           <div>Moedas: <b title={player.money}>{fmtMoney(player.money)} 💰</b></div>
-          <div>Slots usados: {Object.values(inventory).reduce((a,b)=>a+b,0)} / {player.inventorySlots}</div>
+          <div>Slots usados: {usedSlots} / {totalSlots}</div>
           <div>Arma: {safeEquip.weapon? parseQualityKey(safeEquip.weapon).q.toUpperCase(): "(nenhuma)"} <span className="badge badge-info">{safeEquip.weaponDur ?? 0}%</span></div>
           <div>Armadura: {safeEquip.armor? parseQualityKey(safeEquip.armor).q.toUpperCase(): "(nenhuma)"} <span className="badge badge-info">{safeEquip.armorDur ?? 0}%</span></div>
         </div>
@@ -37,7 +42,7 @@ export default function TabPrincipalView({ ctx }){
 
       <div className="card">
         <h2 className="text-lg font-semibold mb-2">Inventário</h2>
-      <div className="text-xs text-zinc-400 mb-2">Slots: {ctx.inventoryUsedSlots} / {ctx.inventorySlots}</div>
+      <div className="text-xs text-zinc-400 mb-2">Slots: {usedSlots} / {totalSlots}</div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
           {ITEMS.map(it=>{
             // Checar quantidade total (somando variantes de qualidade)
