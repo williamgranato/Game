@@ -106,7 +106,6 @@ export default function AldoriaGuilds(){
     setInventory(inv=>({...inv, [key]: Math.max(0,(inv[key]||0)-qty) }));
   }
 
-  // === Utility functions ===
   function spend(amount){
     if(player.money < amount) return false;
     setPlayer(p => ({...p, money: p.money - amount}));
@@ -128,7 +127,6 @@ export default function AldoriaGuilds(){
     };
   }
 
-  // Rotating offers (mercado)
   const [rotatingOffers,setRotatingOffers] = useState([]);
   function rollOffers(){
     const offers = [];
@@ -171,13 +169,19 @@ export default function AldoriaGuilds(){
     <div className="p-2 md:p-4">
       <HeaderHUD user={user} player={player} day={day} hour={hour} season={season} rankIcon={RANKS[rankIdx].icon} rankName={RANKS[rankIdx].name} onRest={()=>{}} onLogout={()=>{}}/>
       <div className="flex gap-2 my-4">
-        {["principal","guilda","mercado","leilao","crafting"].map(t=>(
+        {[
+          {key:"principal", label:"Principal", icon:"🏠"},
+          {key:"guilda", label:"Guilda", icon:"🛡️"},
+          {key:"mercado", label:"Mercado", icon:"💰"},
+          {key:"leilao", label:"Leilão", icon:"⚖️"},
+          {key:"crafting", label:"Crafting", icon:"🔨"}
+        ].map(t=>(
           <button
-            key={t}
-            onClick={()=>setTab(t)}
-            className={`px-3 py-1.5 rounded-xl border ${tab===t ? 'border-yellow-500 bg-yellow-500/10 text-yellow-200 shadow' : 'border-zinc-700 bg-zinc-800/60 text-zinc-200'} transition-all flex items-center gap-2`}
+            key={t.key}
+            onClick={()=>setTab(t.key)}
+            className={`px-3 py-1.5 rounded-xl border ${tab===t.key ? 'border-yellow-500 bg-yellow-500/10 text-yellow-200 shadow' : 'border-zinc-700 bg-zinc-800/60 text-zinc-200'} transition-all flex items-center gap-2 hover:scale-105`}
           >
-            {t.toUpperCase()}
+            <span>{t.icon}</span> {t.label}
           </button>
         ))}
       </div>

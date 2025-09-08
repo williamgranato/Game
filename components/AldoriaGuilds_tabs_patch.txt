@@ -1,0 +1,19 @@
+...
+      <div className="flex gap-2 my-4">
+        {[
+          {key:"principal", label:"Principal", icon:"🏠"},
+          {key:"guilda", label:"Guilda", icon:"🛡️"},
+          {key:"mercado", label:"Mercado", icon:"💰"},
+          {key:"leilao", label:"Leilão", icon:"⚖️"},
+          {key:"crafting", label:"Crafting", icon:"🔨"}
+        ].map(t=>(
+          <button
+            key={t.key}
+            onClick={()=>setTab(t.key)}
+            className={`px-3 py-1.5 rounded-xl border ${tab===t.key ? 'border-yellow-500 bg-yellow-500/10 text-yellow-200 shadow' : 'border-zinc-700 bg-zinc-800/60 text-zinc-200'} transition-all flex items-center gap-2 hover:scale-105`}
+          >
+            <span>{t.icon}</span> {t.label}
+          </button>
+        ))}
+      </div>
+...
