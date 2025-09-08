@@ -51,9 +51,18 @@ self["webpackHotUpdate_N_E"]("webpack",{},
 /******/ 	};
 /******/ }();
 /******/ 
+/******/ /* webpack/runtime/get javascript chunk filename */
+/******/ !function() {
+/******/ 	// This function allow to reference async chunks
+/******/ 	__webpack_require__.u = function(chunkId) {
+/******/ 		// return url for filenames based on template
+/******/ 		return "static/chunks/" + chunkId + ".js";
+/******/ 	};
+/******/ }();
+/******/ 
 /******/ /* webpack/runtime/getFullHash */
 /******/ !function() {
-/******/ 	__webpack_require__.h = function() { return "7fc11136aed379cf"; }
+/******/ 	__webpack_require__.h = function() { return "09d6f7e3ed4ce443"; }
 /******/ }();
 /******/ 
 /******/ }
