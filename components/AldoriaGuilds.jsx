@@ -10,7 +10,6 @@ import TabMercadoView from "./tabs/TabMercadoView";
 import TabLeilaoView from "./tabs/TabLeilaoView";
 import TabCraftingView from "./tabs/TabCraftingView";
 
-const clamp = (v,min,max)=>Math.max(min,Math.min(max,v));
 const rand  = (a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const uid   = ()=>Math.random().toString(36).slice(2);
 
@@ -35,7 +34,6 @@ const RANKS=[
 ];
 
 export default function AldoriaGuilds(){
-  const [dbPlayerId,setDbPlayerId] = useState(null);
   const [user,setUser] = useState(null);
   const [day,setDay] = useState(1);
   const [hour,setHour] = useState(8);
@@ -44,22 +42,12 @@ export default function AldoriaGuilds(){
 
   const [log,setLog] = useState([{ t:'success', msg:'Bem-vindo à Guilda!' }]);
   const [player,setPlayer] = useState({
-    created:false, name:'',
-    level:1, xp:0,
-    hp:100, stamina: 100, power:10, trade:5, rp:0,
-    talents:{ comercio:0, coleta:0, combate:0, crit:0, esquiva:0 },
-    talentPts: 10,
-    attrs:{ forca:0, destreza:0, vigor:0, arcano:0, carisma:0, sagacidade:0, points:10 },
-    appearance:{ gender:'male', hair:'short_brown', skin:'light', face:'base', clazz:'warrior' },
-    equip:{ weapon:null, armor:null, weaponDur:100, armorDur:100 },
+    name:'', level:1, xp:0, hp:100, stamina:100, power:10, trade:5, rp:0,
     money: toBronze({ copper: 60 }),
     inventorySlots: 10,
-    rank: 'bronze',
-    abilityCD:0
+    rank: 'bronze'
   });
-  const [inventory,setInventory] = useState({
-    herb_common:0, ore_iron:0, leather_raw:0, potion_minor:1, arrows_20:0, repair_kit:1, dagger_iron:0, armor_leather:0
-  });
+  const [inventory,setInventory] = useState({});
 
   const [contracts,setContracts] = useState([]);
   const [activeContractId,setActiveContractId] = useState(null);
@@ -80,30 +68,16 @@ export default function AldoriaGuilds(){
     return used;
   }
 
-  function addItem(idOrKey, qty, q='regular'){
-    const key = idOrKey.includes('__') ? idOrKey : withQualityKey(idOrKey, q);
+  function addItem(id, qty, q='regular'){
     setInventory(inv => {
-      const before = inv[key] || 0;
-      const toAdd = qty || 0;
-      const newQty = before + toAdd;
-
-      const usedBeforeTotal = calcUsedSlots(inv);
-      const usedBeforeKey = Math.ceil(Math.max(0, before)/STACK_SIZE);
-      const usedAfterKey  = Math.ceil(Math.max(0, newQty)/STACK_SIZE);
-      const usedAfterTotal = usedBeforeTotal - usedBeforeKey + usedAfterKey;
-
-      const slots = player?.inventorySlots ?? 10;
-      if (usedAfterTotal > slots){
-        pushLog({ t:'warn', msg:'Inventário cheio. Compre uma melhoria de mochila no Mercado.' });
-        return inv;
-      }
-      return { ...inv, [key]: newQty };
+      const before = inv[id] || 0;
+      const newQty = before + (qty||0);
+      return { ...inv, [id]: newQty };
     });
   }
 
-  function removeItem(idOrKey,qty,q='regular'){
-    const key = idOrKey.includes('__')?idOrKey:withQualityKey(idOrKey,q);
-    setInventory(inv=>({...inv, [key]: Math.max(0,(inv[key]||0)-qty) }));
+  function removeItem(id, qty){
+    setInventory(inv => ({ ...inv, [id]: Math.max(0,(inv[id]||0)-qty) }));
   }
 
   function spend(amount){
@@ -117,21 +91,13 @@ export default function AldoriaGuilds(){
   }
 
   function rollContract(rankKey, season){
-    return {
-      id: uid(),
-      title: `Contrato de ${rankKey}`,
-      status: 'disponivel',
-      req: { ore_iron: 1 },
-      reward: { money: 5 },
-      expiresIn: 24
-    };
+    return { id: uid(), title:`Contrato de ${rankKey}`, status:'disponivel', req:{ ore_iron:1 }, reward:{ money:5 }, expiresIn:24 };
   }
 
   const [rotatingOffers,setRotatingOffers] = useState([]);
   function rollOffers(){
     const offers = [];
-    const count = 6;
-    for(let i=0;i<count;i++){
+    for(let i=0;i<6;i++){
       const it = ITEMS[rand(0,ITEMS.length-1)];
       const q = QUALITY_ORDER[rand(0,QUALITY_ORDER.length-1)];
       const qty = rand(1,4);
@@ -141,7 +107,7 @@ export default function AldoriaGuilds(){
     return offers;
   }
   useEffect(()=>{ if(hour % 6 === 0){ setRotatingOffers(rollOffers()); } }, [hour]);
-  useEffect(()=>{ if(!rotatingOffers || rotatingOffers.length===0){ setRotatingOffers(rollOffers()); } }, []);
+  useEffect(()=>{ if(rotatingOffers.length===0){ setRotatingOffers(rollOffers()); } }, []);
 
   function buyFromOffers(offerId){
     const offer = rotatingOffers.find(o=>o.id===offerId);
@@ -149,6 +115,7 @@ export default function AldoriaGuilds(){
     if(player.money < offer.price) return;
     setPlayer(p=>({...p, money: p.money - offer.price }));
     addItem(offer.item, offer.qty, offer.q);
+    setInventory(inv => ({ ...inv })); // força re-render
     setRotatingOffers(rs=>rs.map(r=> r.id===offerId?{...r, stock:r.stock-1}:r));
   }
 

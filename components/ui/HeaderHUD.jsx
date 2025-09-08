@@ -31,8 +31,8 @@ export default function HeaderHUD({ user, player, day, hour, season, rankIcon, r
       <div className="flex items-center gap-3">
         <img src="/images/avatar.png" width={64} height={64} alt="avatar" className="rounded-xl border border-zinc-800 shadow-medieval"/>
         <div>
-          <h1 className="text-xl md:text-2xl font-bold heading-medieval text-yellow-300 drop-shadow-md animate-pulseSlow">Aldória Guilds — {user}</h1>
-          <p className="text-zinc-200">Dia {day}, {String(hour).padStart(2,'0')}:00 — {season?.icon} {season?.name} · Aventureiro: {rankName} {rankIcon}</p>
+          <img src="/images/logo.png" alt="Logo" className="h-12 md:h-16 object-contain mb-1"/>
+          <p className="text-zinc-200">Dia {day}, {String(hour).padStart(2,'0')}:00 — {season?.icon} {season?.name} · Aventureiro: {rankName} {rankIcon} · {user}</p>
         </div>
       </div>
       <div className="flex flex-col md:flex-row gap-3 md:items-center">
